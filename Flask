@@ -1,0 +1,21 @@
+import os
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+PORT = int(os.environ.get("PORT", 5000))
+
+CLIENT_COMMANDS = {}
+
+@app.route("/poll/<client_id>")
+def poll(client_id):
+    cmd = CLIENT_COMMANDS.pop(client_id, None)
+    return jsonify(cmd) if cmd else ""
+
+@app.route("/command/<client_id>", methods=["POST"])
+def command(client_id):
+    cmd = request.get_json()
+    CLIENT_COMMANDS[client_id] = cmd
+    return "OK"
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=PORT)
